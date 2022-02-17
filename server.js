@@ -5,8 +5,7 @@ const {google} = require("googleapis");
 const bodyParser = require('body-parser');
 const port = process.env.port || 1337;
 
-require("dotenv").config();
-
+// require("dotenv").config();
 
 // paths constants, to reduce typos
 const path = require("path");

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon server.js"
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -20,5 +20,14 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PERSEUS-1337/first-demo-repo.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/PERSEUS-1337/first-demo-repo/issues"
+  },
+  "homepage": "https://github.com/PERSEUS-1337/first-demo-repo#readme"
 }

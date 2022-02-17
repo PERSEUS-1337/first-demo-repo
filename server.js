@@ -3,7 +3,7 @@ const app = express();
 // const cors = require("cors");
 const {google} = require("googleapis");
 const bodyParser = require('body-parser');
-const port = process.env.port || 1337;
+const PORT = process.env.PORT || 5000;
 
 // require("dotenv").config();
 
@@ -45,110 +45,198 @@ function auth(req, res, next) {
     }
 }
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(logger)
-// app.use(cors());
-// app.use(express.json());
+express()
+    .use(bodyParser.urlencoded({ extended: true }))
+    .use(logger)
+    .get("/", (req, res) => {
+        console.log(">Default Page");
+        res.sendFile(path.join(__dirname+defaultPath));
+        console.log("Email is: "+ emailData);
+        // res.json({success: "Hello World"});
+    })
+    .use(express.static(path.join(__dirname+'/html')))
+    .get("/test", auth, (req, res) => {
+        console.log(">Test Page");
+        res.sendFile(path.join(__dirname+gamePath));
+    })
+    .get("/instructions", auth, (req, res) => {
+        console.log(">Instructions Page");
+        res.send("Instructions Page");
+    })
+    .get("/login/legit", auth, async (req, res) => {
+        console.log(">Login Page");
+        res.sendFile(path.join(__dirname+loginPath));
+        // console.log(">Email is: " + emailData);
+    })
+    .get("/login", async (req, res) => {
+        console.log(">Login Page");
+        res.sendFile(path.join(__dirname+login2Path));
+        // console.log(">Email is: " + emailData);
+    })
+    .post("/login/legit", async (req, res) => {
+        let dateObj = new Date();
+        let date = ("0" + dateObj.getDate()).slice(-2);
+        let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+        let year = dateObj.getFullYear();
+        let hours = dateObj.getHours();
+        let minutes = dateObj.getMinutes();
+        let seconds = dateObj.getSeconds();
+        const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+    
+        const auth = new google.auth.GoogleAuth({
+            keyFile: "credentials.json",
+            scopes: "https://www.googleapis.com/auth/spreadsheets",
+        });
+    
+        // Create client instance for auth
+        const client = await auth.getClient();
+    
+        // Instance of Google Sheets API
+        const googleSheets = google.sheets({ version: "v4", auth: client });
+    
+        const spreadsheetId = "18jCkI5Ut3VaO8jG7unzilpDdtB8zlnLjLtLvTqy2-io";
+    
+        // Get metadata about spreadsheet
+        const metaData = await googleSheets.spreadsheets.get({
+            auth,
+            spreadsheetId,
+        });
+    
+        // Read rows from spreadsheet
+        const getRows = await googleSheets.spreadsheets.values.get({
+            auth,
+            spreadsheetId,
+            range: "Sheet1!A:A",
+        });
+    
+        let dataArray = [currDate, emailData];
+        sampleDataLoop(dataArray);
+    
+        // Write row(s) to spreadsheet
+        await googleSheets.spreadsheets.values.append({
+            auth,
+            spreadsheetId,
+            range: "Sheet1!A:FF",
+            valueInputOption: "USER_ENTERED",
+            resource: {
+                values: [
+                    dataArray,
+                ],
+            },
+        });
+        res.sendFile(path.join(__dirname+defaultPath));
+        console.log("Successfully Submitted Email: "+emailData);
+    })
+    .post("/login", (req, res) => {
+        emailData = req.body.user.email;
+        console.log("Email is: "+ emailData);
+        res.sendFile(path.join(__dirname+defaultPath));
+    })
+    .listen(PORT, () => console.log(`Listening on ${ PORT }`));
+
+
+// app.use(logger)
 
 // Default Page
-app.get("/", (req, res) => {
-    console.log(">Default Page");
-    res.sendFile(path.join(__dirname+defaultPath));
-    console.log("Email is: "+ emailData);
-    // res.json({success: "Hello World"});
-});
+// app.get("/", (req, res) => {
+//     console.log(">Default Page");
+//     res.sendFile(path.join(__dirname+defaultPath));
+//     console.log("Email is: "+ emailData);
+//     // res.json({success: "Hello World"});
+// });
 
 // to prevent game from loading first
-app.use(express.static(path.join(__dirname+'/html')));
+// app.use(express.static(path.join(__dirname+'/html')));
 
-app.get("/test", auth, (req, res) => {
-    console.log(">Test Page");
-    res.sendFile(path.join(__dirname+gamePath));
-});
+// app.get("/test", auth, (req, res) => {
+//     console.log(">Test Page");
+//     res.sendFile(path.join(__dirname+gamePath));
+// });
 
-app.get("/instructions", auth, (req, res) => {
-    console.log(">Instructions Page");
-    res.send("Instructions Page");
-});
+// app.get("/instructions", auth, (req, res) => {
+//     console.log(">Instructions Page");
+//     res.send("Instructions Page");
+// });
 
-app.get("/login/legit", auth, async (req, res) => {
-    console.log(">Login Page");
-    res.sendFile(path.join(__dirname+loginPath));
-    // console.log(">Email is: " + emailData);
-});
+// app.get("/login/legit", auth, async (req, res) => {
+//     console.log(">Login Page");
+//     res.sendFile(path.join(__dirname+loginPath));
+//     // console.log(">Email is: " + emailData);
+// });
 
-app.get("/login", async (req, res) => {
-    console.log(">Login Page");
-    res.sendFile(path.join(__dirname+login2Path));
-    // console.log(">Email is: " + emailData);
-});
+// app.get("/login", async (req, res) => {
+//     console.log(">Login Page");
+//     res.sendFile(path.join(__dirname+login2Path));
+//     // console.log(">Email is: " + emailData);
+// });
 
-app.post("/login/legit", async (req, res) => {
-    let dateObj = new Date();
-    let date = ("0" + dateObj.getDate()).slice(-2);
-    let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
-    let year = dateObj.getFullYear();
-    let hours = dateObj.getHours();
-    let minutes = dateObj.getMinutes();
-    let seconds = dateObj.getSeconds();
-    const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+// app.post("/login/legit", async (req, res) => {
+//     let dateObj = new Date();
+//     let date = ("0" + dateObj.getDate()).slice(-2);
+//     let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+//     let year = dateObj.getFullYear();
+//     let hours = dateObj.getHours();
+//     let minutes = dateObj.getMinutes();
+//     let seconds = dateObj.getSeconds();
+//     const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
 
-    const auth = new google.auth.GoogleAuth({
-        keyFile: "credentials.json",
-        scopes: "https://www.googleapis.com/auth/spreadsheets",
-    });
+//     const auth = new google.auth.GoogleAuth({
+//         keyFile: "credentials.json",
+//         scopes: "https://www.googleapis.com/auth/spreadsheets",
+//     });
 
-    // Create client instance for auth
-    const client = await auth.getClient();
+//     // Create client instance for auth
+//     const client = await auth.getClient();
 
-    // Instance of Google Sheets API
-    const googleSheets = google.sheets({ version: "v4", auth: client });
+//     // Instance of Google Sheets API
+//     const googleSheets = google.sheets({ version: "v4", auth: client });
 
-    const spreadsheetId = "18jCkI5Ut3VaO8jG7unzilpDdtB8zlnLjLtLvTqy2-io";
+//     const spreadsheetId = "18jCkI5Ut3VaO8jG7unzilpDdtB8zlnLjLtLvTqy2-io";
 
-    // Get metadata about spreadsheet
-    const metaData = await googleSheets.spreadsheets.get({
-        auth,
-        spreadsheetId,
-    });
+//     // Get metadata about spreadsheet
+//     const metaData = await googleSheets.spreadsheets.get({
+//         auth,
+//         spreadsheetId,
+//     });
 
-    // Read rows from spreadsheet
-    const getRows = await googleSheets.spreadsheets.values.get({
-        auth,
-        spreadsheetId,
-        range: "Sheet1!A:A",
-    });
+//     // Read rows from spreadsheet
+//     const getRows = await googleSheets.spreadsheets.values.get({
+//         auth,
+//         spreadsheetId,
+//         range: "Sheet1!A:A",
+//     });
 
-    let dataArray = [currDate, emailData];
-    sampleDataLoop(dataArray);
+//     let dataArray = [currDate, emailData];
+//     sampleDataLoop(dataArray);
 
-    // Write row(s) to spreadsheet
-    await googleSheets.spreadsheets.values.append({
-        auth,
-        spreadsheetId,
-        range: "Sheet1!A:FF",
-        valueInputOption: "USER_ENTERED",
-        resource: {
-            values: [
-                dataArray,
-            ],
-        },
-    });
-    res.sendFile(path.join(__dirname+defaultPath));
-    console.log("Successfully Submitted Email: "+emailData);
-});
+//     // Write row(s) to spreadsheet
+//     await googleSheets.spreadsheets.values.append({
+//         auth,
+//         spreadsheetId,
+//         range: "Sheet1!A:FF",
+//         valueInputOption: "USER_ENTERED",
+//         resource: {
+//             values: [
+//                 dataArray,
+//             ],
+//         },
+//     });
+//     res.sendFile(path.join(__dirname+defaultPath));
+//     console.log("Successfully Submitted Email: "+emailData);
+// });
 
-app.post("/login", (req, res) => {
-    emailData = req.body.user.email;
-    console.log("Email is: "+ emailData);
-    res.sendFile(path.join(__dirname+defaultPath));
-});
+// app.post("/login", (req, res) => {
+//     emailData = req.body.user.email;
+//     console.log("Email is: "+ emailData);
+//     res.sendFile(path.join(__dirname+defaultPath));
+// });
 
-app.listen(port, err => {
-    if (err) {
-        return console.log(">ERROR", err);
-    }
-    console.log('>Listening on port ' + port);
-}); 
+
+// app.listen(port, err => {
+//     if (err) {
+//         return console.log(">ERROR", err);
+//     }
+//     console.log('>Listening on port ' + port);
+// }); 
 
 

@@ -10,13 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.2",
     "googleapis": "^92.0.0",
-    "node-fetch": "^3.2.0",
-    "pug": "^3.0.2"
+    "node-fetch": "^3.2.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

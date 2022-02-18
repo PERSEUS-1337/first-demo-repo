@@ -5,7 +5,10 @@ const {google} = require("googleapis");
 const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 5000;
 
-// require("dotenv").config();
+// const jsonCreator = require("./jsonCreator");
+// const createFile = jsonCreator.createJSONFile;
+
+require("dotenv").config();
 
 // paths constants, to reduce typos
 const path = require("path");
@@ -74,6 +77,8 @@ express()
         // console.log(">Email is: " + emailData);
     })
     .post("/login/legit", async (req, res) => {
+        // createFile();
+
         let dateObj = new Date();
         let date = ("0" + dateObj.getDate()).slice(-2);
         let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
@@ -85,7 +90,7 @@ express()
 
         // let keyFileAPI = process.env.GOOGLE_APPLICATION_CREDENTIALS;
         const auth = new google.auth.GoogleAuth({
-            keyFile: "google-credentials.json",
+            keyFile: "./app/google-credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets",
         });
     

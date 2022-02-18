@@ -79,17 +79,17 @@ express()
     })
     .get("/instructions", auth, (req, res) => {
         console.log(">Instructions Page");
-        jsonCreator();
-        const jsonString = JSON.stringify(authObject, null, 2);
-        fs.writeFile("./credentials.json", jsonString, err =>{
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("File Successfully Written!");
-            }
-        });
-        res.send(jsonString);
-        // res.send("Instructions Page");
+        // jsonCreator();
+        // const jsonString = JSON.stringify(authObject, null, 2);
+        // fs.writeFile("./credentials.json", jsonString, err =>{
+        //     if (err) {
+        //         console.log(err);
+        //     } else {
+        //         console.log("File Successfully Written!");
+        //     }
+        // });
+        // res.send(jsonString);
+        res.send("Instructions Page");
     })
     .get("/login/legit", auth, async (req, res) => {
         console.log(">Login Page");
@@ -115,7 +115,7 @@ express()
 
         // let keyFileAPI = process.env.GOOGLE_APPLICATION_CREDENTIALS;
         const auth = new google.auth.GoogleAuth({
-            keyFile: authObject,
+            keyFile: "./app/google-credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets",
         });
     

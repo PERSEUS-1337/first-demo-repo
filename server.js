@@ -113,7 +113,7 @@ express()
 
         // let keyFileAPI = process.env.GOOGLE_APPLICATION_CREDENTIALS;
         const auth = new google.auth.GoogleAuth({
-            keyFile: "./app/google-credentials.json",
+            keyFile: "google-credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets",
         });
     

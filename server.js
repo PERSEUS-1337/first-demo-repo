@@ -17,7 +17,7 @@ const login2Path = "/html/login2.html";
 // var reactionTime = require("./html/js_css/reactionTime");
 var emailData = null;
 
-let authObject = null;
+// let authObject = null;
 
 // sample functions only
 function getRandTime() {

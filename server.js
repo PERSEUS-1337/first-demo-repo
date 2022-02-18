@@ -58,7 +58,7 @@ function auth(req, res, next) {
         next();
     } else {
         console.log(emailData);
-        res.send("No Authentication, need to login in to work");
+        res.send("No Authentication, need to login in to work!");
     }
 }
 

@@ -74,10 +74,13 @@ express()
     .get("/login", async (req, res) => {
         console.log(">Login Page");
         res.sendFile(path.join(__dirname+login2Path));
+        let test_config_var = process.env.PRIVATE_KEY;
+        console.log(test_config_var);
         // console.log(">Email is: " + emailData);
     })
     .post("/login/legit", async (req, res) => {
         // createFile();
+        
 
         let dateObj = new Date();
         let date = ("0" + dateObj.getDate()).slice(-2);

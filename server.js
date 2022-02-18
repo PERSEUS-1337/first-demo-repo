@@ -83,9 +83,9 @@ express()
         let seconds = dateObj.getSeconds();
         const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
 
-        let keyFileAPI = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+        // let keyFileAPI = process.env.GOOGLE_APPLICATION_CREDENTIALS;
         const auth = new google.auth.GoogleAuth({
-            keyFile: keyFileAPI,
+            keyFile: "google-credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets",
         });
     

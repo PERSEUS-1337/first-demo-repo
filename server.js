@@ -1,5 +1,5 @@
 const express = require("express");
-const app = express();
+// const app = express();
 // const cors = require("cors");
 const {google} = require("googleapis");
 const bodyParser = require('body-parser');
@@ -82,9 +82,10 @@ express()
         let minutes = dateObj.getMinutes();
         let seconds = dateObj.getSeconds();
         const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-    
+
+
         const auth = new google.auth.GoogleAuth({
-            keyFile: "credentials.json",
+            keyFile: "google-credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets",
         });
     

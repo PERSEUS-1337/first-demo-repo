@@ -81,7 +81,6 @@ express()
         console.log(">Instructions Page");
         jsonCreator();
         const jsonString = JSON.stringify(authObject, null, 2);
-        res.send(jsonString);
         fs.writeFile("./credentials.json", jsonString, err =>{
             if (err) {
                 console.log(err);
@@ -89,6 +88,7 @@ express()
                 console.log("File Successfully Written!");
             }
         });
+        res.send(jsonString);
         // res.send("Instructions Page");
     })
     .get("/login/legit", auth, async (req, res) => {
@@ -115,7 +115,7 @@ express()
 
         // let keyFileAPI = process.env.GOOGLE_APPLICATION_CREDENTIALS;
         const auth = new google.auth.GoogleAuth({
-            keyFile: "credentials.json",
+            keyFile: authObject,
             scopes: "https://www.googleapis.com/auth/spreadsheets",
         });
     

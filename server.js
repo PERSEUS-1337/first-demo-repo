@@ -1,5 +1,5 @@
 const express = require("express");
-// const fs = require('fs');
+const fs = require('fs');
 
 const {google} = require("googleapis");
 const bodyParser = require('body-parser');
@@ -14,7 +14,6 @@ const gamePath = "/html/index.html";
 const loginPath = "/html/login.html";
 const login2Path = "/html/login2.html";
 
-// var reactionTime = require("./html/js_css/reactionTime");
 var emailData = null;
 
 // let authObject = null;
@@ -59,7 +58,7 @@ function auth(req, res, next) {
         next();
     } else {
         console.log(emailData);
-        res.send("No Authentication, need to login in http://localhost:1337/login2 to work");
+        res.send("No Authentication, need to login in to work");
     }
 }
 
@@ -70,7 +69,6 @@ express()
         console.log(">Default Page");
         res.sendFile(path.join(__dirname+defaultPath));
         console.log("Email is: "+ emailData);
-        // res.json({success: "Hello World"});
     })
     .use(express.static(path.join(__dirname+'/html')))
     .get("/test", auth, (req, res) => {

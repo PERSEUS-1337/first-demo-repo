@@ -17,18 +17,7 @@ const login2Path = "/html/login2.html";
 // var reactionTime = require("./html/js_css/reactionTime");
 var emailData = null;
 
-let authObject = {
-    type: process.env.TYPE,
-    project_id: process.env.PROJECT_ID,
-    private_key_id: process.env.PRIVATE_KEY_ID,
-    private_key: process.env.PRIVATE_KEY,
-    client_email: process.env.CLIENT_EMAIL,
-    client_id: process.env.CLIENT_ID,
-    auth_uri: process.env.AUTH_URI,
-    token_uri: process.env.TOKEN_URI,
-    auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
-    client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
-};
+let authObject = null;
 
 // sample functions only
 function getRandTime() {
@@ -40,6 +29,22 @@ function sampleDataLoop(arr) {
         arr.push(getRandTime());
     }
     return arr;
+}
+
+function jsonCreator () {
+    authObject = {
+        type: process.env.TYPE,
+        project_id: process.env.PROJECT_ID,
+        private_key_id: process.env.PRIVATE_KEY_ID,
+        private_key: process.env.PRIVATE_KEY,
+        client_email: process.env.CLIENT_EMAIL,
+        client_id: process.env.CLIENT_ID,
+        auth_uri: process.env.AUTH_URI,
+        token_uri: process.env.TOKEN_URI,
+        auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
+        client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
+    }
+    return authObject;
 }
 
 // middleware functions
@@ -74,7 +79,17 @@ express()
     })
     .get("/instructions", auth, (req, res) => {
         console.log(">Instructions Page");
-        res.send("Instructions Page");
+        jsonCreator();
+        const jsonString = JSON.stringify(authObject, null, 2);
+        res.send(jsonString);
+        fs.writeFile("./credentials.json", jsonString, err =>{
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("File Successfully Written!");
+            }
+        });
+        // res.send("Instructions Page");
     })
     .get("/login/legit", auth, async (req, res) => {
         console.log(">Login Page");
@@ -83,14 +98,11 @@ express()
     })
     .get("/login", async (req, res) => {
         console.log(">Login Page");
-        // res.sendFile(path.join(__dirname+login2Path));
-        const jsonString = JSON.stringify(authObject);
-        res.send(jsonString);
-        // console.log(">Email is: " + emailData);
+        res.sendFile(path.join(__dirname+login2Path));
+        console.log(">Email is: " + emailData);
     })
     .post("/login/legit", async (req, res) => {
         // createFile();
-        
 
         let dateObj = new Date();
         let date = ("0" + dateObj.getDate()).slice(-2);
@@ -103,7 +115,7 @@ express()
 
         // let keyFileAPI = process.env.GOOGLE_APPLICATION_CREDENTIALS;
         const auth = new google.auth.GoogleAuth({
-            keyFile: "./app/google-credentials.json",
+            keyFile: "credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets",
         });
     

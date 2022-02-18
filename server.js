@@ -1,12 +1,9 @@
 const express = require("express");
-// const app = express();
-// const cors = require("cors");
+const fs = require('fs');
+
 const {google} = require("googleapis");
 const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 5000;
-
-// const jsonCreator = require("./jsonCreator");
-// const createFile = jsonCreator.createJSONFile;
 
 require("dotenv").config();
 
@@ -19,6 +16,19 @@ const login2Path = "/html/login2.html";
 
 // var reactionTime = require("./html/js_css/reactionTime");
 var emailData = null;
+
+let authObject = {
+    type: process.env.TYPE,
+    project_id: process.env.PROJECT_ID,
+    private_key_id: process.env.PRIVATE_KEY_ID,
+    private_key: process.env.PRIVATE_KEY,
+    client_email: process.env.CLIENT_EMAIL,
+    client_id: process.env.CLIENT_ID,
+    auth_uri: process.env.AUTH_URI,
+    token_uri: process.env.TOKEN_URI,
+    auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
+    client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
+};
 
 // sample functions only
 function getRandTime() {
@@ -73,9 +83,9 @@ express()
     })
     .get("/login", async (req, res) => {
         console.log(">Login Page");
-        res.sendFile(path.join(__dirname+login2Path));
-        let test_config_var = process.env.PRIVATE_KEY;
-        console.log(test_config_var);
+        // res.sendFile(path.join(__dirname+login2Path));
+        const jsonString = JSON.stringify(authObject);
+        res.send(jsonString);
         // console.log(">Email is: " + emailData);
     })
     .post("/login/legit", async (req, res) => {

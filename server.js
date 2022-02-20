@@ -1,5 +1,7 @@
 const express = require("express");
 const fs = require('fs');
+const session = require("express-session");
+// const storeSessionStorage = storage.storeSessionStorage();
 
 const {google} = require("googleapis");
 const bodyParser = require('body-parser');
@@ -15,7 +17,7 @@ const loginPath = "/html/login.html";
 const login2Path = "/html/login2.html";
 const instructionsPath = "/html/instructions.html";
 
-var emailData = null;
+let emailData = null;
 
 // sample functions only
 function getRandTime() {
@@ -29,7 +31,6 @@ function sampleDataLoop(arr) {
     return arr;
 }
 
-
 // middleware functions
 function logger(req, res, next) {
     console.log(">Log");
@@ -38,10 +39,10 @@ function logger(req, res, next) {
 
 function auth(req, res, next) {
     console.log(">Auth");
-    if (emailData !== null) {
+    if (req.session.emailStored) {
         next();
     } else {
-        console.log(emailData);
+        console.log(req.session.emailStored);
         res.send("No Authentication, need to login in to work!");
     }
 }
@@ -49,17 +50,26 @@ function auth(req, res, next) {
 express()
     .use(bodyParser.urlencoded({ extended: true }))
     .use(logger)
+    .use(session({
+        secret: 'keyboard cat',
+        resave: false,
+        saveUninitialized: true
+    }))
     .get("/", (req, res) => {
+        // if (!req.session.emailStored) {
+        //     req.session.emailStored = "none";
+        // }
         console.log(">Default Page");
-        console.log("Email is: "+ emailData);
+        console.log("Email is: "+ req.session.emailStored);
         res.redirect("/login");
     })
     .use(express.static(path.join(__dirname+'/html')))
+    
     .get("/instructions", auth, (req, res) => {
         console.log(">Instructions Page");
         res.sendFile(path.join(__dirname+instructionsPath));
     })
-    .get("/game", auth, (req, res) => {
+    .get("/game", auth ,(req, res) => {
         console.log(">Game Page");
         res.sendFile(path.join(__dirname+gamePath));
     })
@@ -69,10 +79,10 @@ express()
     //     res.sendFile(path.join(__dirname+loginPath));
     //     console.log(">Email is: " + emailData);
     // })
-    .get("/login", async (req, res) => {
+    .get("/login", (req, res) => {
         console.log(">Login Page");
         res.sendFile(path.join(__dirname+login2Path));
-        console.log(">Email is: " + emailData);
+        console.log(">Email is: " + req.session.emailStored);
     })
     // .post("/login/legit", async (req, res) => {
 
@@ -130,10 +140,8 @@ express()
     //     console.log("Successfully Submitted Email: "+emailData);
     // })
     .post("/login", (req, res) => {
-        emailData = req.body.user.email;
-        console.log("Email is: "+ emailData);
-        // res.sendFile(path.join(__dirname+defaultPath));
+        req.session.emailStored = req.body.user.email;
+        console.log("Email is: (session)"+ req.session.emailStored);
         res.sendFile(path.join(__dirname+instructionsPath));
-        // res.redirect("/instructions");
     })
     .listen(PORT, () => console.log(`Listening on ${ PORT }`));

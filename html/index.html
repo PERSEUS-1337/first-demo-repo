@@ -4,30 +4,22 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>Thesis Program | Reaction Test</title>
-        <link href="/js_css/styles.css" type="text/css" rel="stylesheet"/>
+        <link href="./js_css/styles.css" type="text/css" rel="stylesheet"/>
     </head>
     <body>
         <div class="main">
             <div class="header">
                 <h1>Reaction Test</h1>
             </div>
-            <div class="navigation">
-                <h2>INSTRUCTIONS</h2>
-                <p class="information">The numbers will be presented individually for 1500 ms in a pink or blue background at the center of the screen, with the constraint that the same number will not appear twice in succession.<br>When the background of the screen is blue, the participant will use their left hand to report as quickly as possible whether the number presented in the screen is higher or lower than 5.<br>The participant will press the “X” key when the number is higher than 5, and “Z” key when it is lower than 5.<br>Meanwhile, if the background is pink, the participant will use their right hand to report as quickly as possible whether the number in the screen is odd or even.<br>The participant will press the “N” key if the number is odd, and “M” key if the number is even.</p>
-            </div>
-            <div class="canvas-parent">
-                <canvas id="canvas"></canvas>
+            <div class="rectangle">
+                <div class="number" id="number"></div>
             </div>
             <div class="score">
                 <div class="section-1">
                     <button id="start" type="button">Start Game</button>
                 </div>
-                <div class="section-2">
-                    <p>Your time:</p>
-                    <p id="time-text">NO TIME</p>
-                </div>
             </div>
         </div>
     </body>
-    <script src="/js_css/reactionTime.js"></script>
+    <script src="./js_css/reactionTime.js"></script>
 </html>

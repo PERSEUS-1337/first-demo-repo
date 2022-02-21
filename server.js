@@ -25,7 +25,6 @@ function getRandTime() {
     return res;
 }
 function sampleDataLoop(temp) {
-    let temp = [];
     for (let i = 0; i < 160; i++) {
         temp.push(getRandTime());
     }

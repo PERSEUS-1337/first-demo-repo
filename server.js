@@ -51,14 +51,11 @@ express()
     .use(bodyParser.urlencoded({ extended: true }))
     .use(logger)
     .use(session({
-        secret: 'keyboard cat',
+        secret: 'REACTION TIME',
         resave: false,
         saveUninitialized: true
     }))
     .get("/", (req, res) => {
-        // if (!req.session.emailStored) {
-        //     req.session.emailStored = "none";
-        // }
         console.log(">Default Page");
         console.log("Email is: "+ req.session.emailStored);
         res.redirect("/login");
@@ -73,72 +70,71 @@ express()
         console.log(">Game Page");
         res.sendFile(path.join(__dirname+gamePath));
     })
-    
-    // .get("/login/legit", auth, async (req, res) => {
-    //     console.log(">Login Page");
-    //     res.sendFile(path.join(__dirname+loginPath));
-    //     console.log(">Email is: " + emailData);
-    // })
+    .get("/login/legit", auth, async (req, res) => {
+        console.log(">Login Page");
+        res.sendFile(path.join(__dirname+loginPath));
+        console.log(">Email is: " + req.session.emailStored);
+    })
     .get("/login", (req, res) => {
         console.log(">Login Page");
         res.sendFile(path.join(__dirname+login2Path));
         console.log(">Email is: " + req.session.emailStored);
     })
-    // .post("/login/legit", async (req, res) => {
+    .post("/login/legit", async (req, res) => {
 
-    //     let dateObj = new Date();
-    //     let date = ("0" + dateObj.getDate()).slice(-2);
-    //     let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
-    //     let year = dateObj.getFullYear();
-    //     let hours = dateObj.getHours();
-    //     let minutes = dateObj.getMinutes();
-    //     let seconds = dateObj.getSeconds();
-    //     const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+        let dateObj = new Date();
+        let date = ("0" + dateObj.getDate()).slice(-2);
+        let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+        let year = dateObj.getFullYear();
+        let hours = dateObj.getHours();
+        let minutes = dateObj.getMinutes();
+        let seconds = dateObj.getSeconds();
+        const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
 
-    //     const auth = new google.auth.GoogleAuth({
-    //         keyFile: "google-credentials.json",
-    //         scopes: "https://www.googleapis.com/auth/spreadsheets",
-    //     });
+        const auth = new google.auth.GoogleAuth({
+            keyFile: "google-credentials.json",
+            scopes: "https://www.googleapis.com/auth/spreadsheets",
+        });
     
-    //     // Create client instance for auth
-    //     const client = await auth.getClient();
+        // Create client instance for auth
+        const client = await auth.getClient();
     
-    //     // Instance of Google Sheets API
-    //     const googleSheets = google.sheets({ version: "v4", auth: client });
+        // Instance of Google Sheets API
+        const googleSheets = google.sheets({ version: "v4", auth: client });
     
-    //     const spreadsheetId = "18jCkI5Ut3VaO8jG7unzilpDdtB8zlnLjLtLvTqy2-io";
+        const spreadsheetId = "18jCkI5Ut3VaO8jG7unzilpDdtB8zlnLjLtLvTqy2-io";
     
-    //     // Get metadata about spreadsheet
-    //     const metaData = await googleSheets.spreadsheets.get({
-    //         auth,
-    //         spreadsheetId,
-    //     });
+        // Get metadata about spreadsheet
+        const metaData = await googleSheets.spreadsheets.get({
+            auth,
+            spreadsheetId,
+        });
     
-    //     // Read rows from spreadsheet
-    //     const getRows = await googleSheets.spreadsheets.values.get({
-    //         auth,
-    //         spreadsheetId,
-    //         range: "Sheet1!A:A",
-    //     });
+        // Read rows from spreadsheet
+        const getRows = await googleSheets.spreadsheets.values.get({
+            auth,
+            spreadsheetId,
+            range: "Sheet1!A:A",
+        });
     
-    //     let dataArray = [currDate, emailData];
-    //     sampleDataLoop(dataArray);
+        let dataArray = [currDate, req.session.emailStored];
+        sampleDataLoop(dataArray);
     
-    //     // Write row(s) to spreadsheet
-    //     await googleSheets.spreadsheets.values.append({
-    //         auth,
-    //         spreadsheetId,
-    //         range: "Sheet1!A:FF",
-    //         valueInputOption: "USER_ENTERED",
-    //         resource: {
-    //             values: [
-    //                 dataArray,
-    //             ],
-    //         },
-    //     });
-    //     res.sendFile(path.join(__dirname+login2Path));
-    //     console.log("Successfully Submitted Email: "+emailData);
-    // })
+        // Write row(s) to spreadsheet
+        await googleSheets.spreadsheets.values.append({
+            auth,
+            spreadsheetId,
+            range: "Sheet1!A:FF",
+            valueInputOption: "USER_ENTERED",
+            resource: {
+                values: [
+                    dataArray,
+                ],
+            },
+        });
+        res.sendFile(path.join(__dirname+login2Path));
+        console.log("Successfully Submitted Email: "+req.session.emailStored);
+    })
     .post("/login", (req, res) => {
         req.session.emailStored = req.body.user.email;
         console.log("Email is: (session)"+ req.session.emailStored);

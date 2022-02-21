@@ -24,11 +24,12 @@ function getRandTime() {
     let res = Math.floor(Math.random()*10);
     return res;
 }
-function sampleDataLoop(arr) {
+function sampleDataLoop(temp) {
+    let temp = [];
     for (let i = 0; i < 160; i++) {
-        arr.push(getRandTime());
+        temp.push(getRandTime());
     }
-    return arr;
+    return temp;
 }
 
 // middleware functions
@@ -89,7 +90,7 @@ express()
         let hours = dateObj.getHours();
         let minutes = dateObj.getMinutes();
         let seconds = dateObj.getSeconds();
-        const currDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+        req.session.sessionDate = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
 
         const auth = new google.auth.GoogleAuth({
             keyFile: "google-credentials.json",
@@ -117,8 +118,8 @@ express()
             range: "Sheet1!A:A",
         });
     
-        let dataArray = [currDate, req.session.emailStored];
-        sampleDataLoop(dataArray);
+        req.session.dataArray = [req.session.sessionDate, req.session.emailStored, sampleDataLoop(req.session.testArray)];
+        // sampleDataLoop(req.session.testArray);
     
         // Write row(s) to spreadsheet
         await googleSheets.spreadsheets.values.append({
@@ -128,7 +129,7 @@ express()
             valueInputOption: "USER_ENTERED",
             resource: {
                 values: [
-                    dataArray,
+                    req.session.dataArray,
                 ],
             },
         });

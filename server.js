@@ -1,12 +1,8 @@
 const express = require("express");
-const fs = require('fs');
 const session = require("express-session");
-// const storeSessionStorage = storage.storeSessionStorage();
-
 const {google} = require("googleapis");
 const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 5000;
-
 require("dotenv").config();
 
 // paths constants, to reduce typos
@@ -17,19 +13,25 @@ const loginPath = "/html/login.html";
 const login2Path = "/html/login2.html";
 const instructionsPath = "/html/instructions.html";
 
+// const reactionTimeJS = require("./html/js_css/reactionTime.js");
+
 let emailData = null;
 
 // sample functions only
-function getRandTime() {
-    let res = Math.floor(Math.random()*10);
-    return res;
-}
-function sampleDataLoop(temp) {
-    for (let i = 0; i < 160; i++) {
-        temp.push(getRandTime());
-    }
-    return temp;
-}
+// function getRandTime() {
+//     let res = Math.floor(Math.random()*10);
+    
+//     return res;
+// }
+// function sampleDataLoop(temp) {
+//     // for (let i = 0; i < 160; i++) {
+//     //     temp.push(getRandTime());
+//     // }
+//     for (i = 0; i < 5; i++) {
+        
+//     }
+//     return temp;
+// }
 
 // middleware functions
 function logger(req, res, next) {
@@ -50,6 +52,7 @@ function auth(req, res, next) {
 express()
     .use(bodyParser.urlencoded({ extended: true }))
     .use(logger)
+    .use(express.json())
     .use(session({
         secret: 'REACTION TIME',
         resave: false,
@@ -61,12 +64,16 @@ express()
         res.redirect("/login");
     })
     .use(express.static(path.join(__dirname+'/html')))
-    
+    .get("/login", (req, res) => {
+        console.log(">Login Page");
+        res.sendFile(path.join(__dirname+login2Path));
+        console.log(">Email is: " + req.session.emailStored);
+    })
     .get("/instructions", auth, (req, res) => {
         console.log(">Instructions Page");
         res.sendFile(path.join(__dirname+instructionsPath));
     })
-    .get("/game", auth ,(req, res) => {
+    .get("/game", (req, res) => {
         console.log(">Game Page");
         res.sendFile(path.join(__dirname+gamePath));
     })
@@ -75,12 +82,13 @@ express()
         res.sendFile(path.join(__dirname+loginPath));
         console.log(">Email is: " + req.session.emailStored);
     })
-    .get("/login", (req, res) => {
-        console.log(">Login Page");
-        res.sendFile(path.join(__dirname+login2Path));
-        console.log(">Email is: " + req.session.emailStored);
+    .get("/end", (req, res) => {
+        console.log(">End Page");
+        res.send("Thank You!");
     })
-    .post("/login/legit", async (req, res) => {
+    .post("/game", async (req, res) => {
+        const { data } = req.body;
+        console.log("Data = "+ data);
 
         let dateObj = new Date();
         let date = ("0" + dateObj.getDate()).slice(-2);
@@ -116,28 +124,37 @@ express()
             spreadsheetId,
             range: "Sheet1!A:A",
         });
-    
-        req.session.dataArray = [req.session.sessionDate, req.session.emailStored, sampleDataLoop(req.session.testArray)];
-        // sampleDataLoop(req.session.testArray);
-    
+
+        let dataArray = [req.session.sessionDate, req.session.emailStored];
+        for (i = 0; i < data.length-1; i++) {
+            dataArray.push(data[i]);
+        }
+
+        req.session.dataArray = dataArray;
         // Write row(s) to spreadsheet
         await googleSheets.spreadsheets.values.append({
             auth,
             spreadsheetId,
-            range: "Sheet1!A:FF",
+            range: "Sheet1!A:HH",
             valueInputOption: "USER_ENTERED",
             resource: {
                 values: [
-                    req.session.dataArray,
+                    dataArray,
                 ],
             },
         });
-        res.sendFile(path.join(__dirname+login2Path));
+        // res.sendFile(path.join(__dirname+login2Path));
+        // res.redirect("https://first-demo-repo.herokuapp.com/login");
+        res.redirect("http://localhost:5000/login");
+        // res.redirect("/end");
         console.log("Successfully Submitted Email: "+req.session.emailStored);
     })
     .post("/login", (req, res) => {
         req.session.emailStored = req.body.user.email;
         console.log("Email is: (session)"+ req.session.emailStored);
-        res.sendFile(path.join(__dirname+instructionsPath));
+        // res.sendFile(path.join(__dirname+instructionsPath));
+        // res.redirect("https://first-demo-repo.herokuapp.com/instructions");
+        // res.redirect("http://localhost:5000/instructions");
+        res.redirect("/instructions");
     })
     .listen(PORT, () => console.log(`Listening on ${ PORT }`));

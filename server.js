@@ -13,26 +13,6 @@ const loginPath = "/html/login.html";
 const login2Path = "/html/login2.html";
 const instructionsPath = "/html/instructions.html";
 
-// const reactionTimeJS = require("./html/js_css/reactionTime.js");
-
-let emailData = null;
-
-// sample functions only
-// function getRandTime() {
-//     let res = Math.floor(Math.random()*10);
-    
-//     return res;
-// }
-// function sampleDataLoop(temp) {
-//     // for (let i = 0; i < 160; i++) {
-//     //     temp.push(getRandTime());
-//     // }
-//     for (i = 0; i < 5; i++) {
-        
-//     }
-//     return temp;
-// }
-
 // middleware functions
 function logger(req, res, next) {
     console.log(">Log");
@@ -126,7 +106,7 @@ express()
         });
 
         let dataArray = [req.session.sessionDate, req.session.emailStored];
-        for (i = 0; i < data.length-1; i++) {
+        for (i = 0; i < data.length; i++) {
             dataArray.push(data[i]);
         }
 
@@ -135,7 +115,8 @@ express()
         await googleSheets.spreadsheets.values.append({
             auth,
             spreadsheetId,
-            range: "Sheet1!A:HH",
+            range: "Sheet1",
+            // majorDimension: "COLUMNS",
             valueInputOption: "USER_ENTERED",
             resource: {
                 values: [
